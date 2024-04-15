@@ -4,6 +4,6 @@
 
  - To connect to related databases please use the following with the database.
 
- - .env.test: PGDATABASE=<database>_test
+ - .env.test: PGDATABASE=nc_news_test
 
- - .env.development: PGDATABASE=<database>
+ - .env.development: PGDATABASE=nc_news
