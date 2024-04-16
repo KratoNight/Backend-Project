@@ -3,9 +3,7 @@ const { fetchArticlesById } = require('../models/article.model')
 function getArticlesById(req, res, next){
     const { article_id } = req.params
     return fetchArticlesById(article_id).then((article) => {
-        console.log(article)
         res.status(200).send({ article })
-        console.log(article)
     })
     .catch(next)
 }
