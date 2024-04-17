@@ -14,4 +14,18 @@ function fetchArticlesById(article_id) {
 		});
     }
 
-module.exports = { fetchArticlesById }
+function fetchArticles(){
+	return db.query(
+      `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
+	  (SELECT COUNT(*) FROM comments 
+	  WHERE comments.article_id = articles.article_id)::INT AS comment_count 
+	  FROM articles 
+	  ORDER BY articles.created_at DESC;`
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
+
+
+module.exports = { fetchArticlesById, fetchArticles }
