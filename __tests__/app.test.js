@@ -102,7 +102,51 @@ describe('/api/articles/:article_id', () => {
           .get('/api/articles/not-a-number')
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe('Bad request');
+            expect(body.msg).toBe('Bad request!');
           });
       });
+})
+
+describe('/api/articles/:article_id/comments', () => {
+    test('GET 200: Responds with array of comments for the given article_id with all correct properties', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+            expect(comments.length).toBe(11)
+            comments.forEach((comment => {
+                const {comment_id, votes, created_at, author, body, article_id} = comment
+                expect(typeof comment_id).toBe('number')
+                expect(typeof votes).toBe('number')
+                expect(typeof created_at).toBe('string')
+                expect(typeof author).toBe('string')
+                expect(typeof body).toBe('string')
+                expect(typeof article_id).toBe('number')
+            }))
+        })
+    })
+    test('Get 200: Responds with a comments array that is ordered by the dates comment when it was created, this descending by default', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body: { comments } }) => {
+            expect(comments).toBeSortedBy('created_at', { descending: true })
+        })
+    })
+    test('GET 404: Responds with a not found error if article_id is valid but this doesn\'t exist in the database', () => {
+        return request(app)
+        .get('/api/articles/42/comments')
+        .expect(404)
+        .then(({ body: { msg } }) => {
+            expect(msg).toBe('Article not found!')
+        });
+    })
+    test('GET 400: Responds with a bad request error if article_id is not valid', () => {
+        return request(app)
+            .get('/api/articles/not-a-number/comments')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+            expect(msg).toBe('Bad request!')
+        })
+    })
 })
