@@ -12,7 +12,7 @@ function getArticles(req, res, next){
     return fetchArticles().then((articles) => {
         res.status(200).send({ articles })
     })
-    .catch.next
+    .catch
 }
 
 module.exports = { getArticlesById, getArticles }
