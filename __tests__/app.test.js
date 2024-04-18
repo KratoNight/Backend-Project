@@ -216,6 +216,7 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 })
+
 describe('/api/articles/:article_id/comments', () => {
     test('POST 201: Responds with a comment object that has been inserted into the comments table and contains the relevent information', () => {
         const fakeCommentForTesting = { username: 'lurker', body: 'Just a random comment for testing purposes!'}
@@ -283,4 +284,28 @@ describe('/api/articles/:article_id/comments', () => {
             expect(body.msg).toBe('Bad request!');
           });
       });
+})
+
+describe('/api/comments/:comment_id', () => {
+    test('DELETE 204: Deletes the specified comment and sends no body back', () => {
+        return request(app)
+        .delete('/api/comments/3')
+        .expect(204)
+    })
+    test('DELETE 400: Responds with a bad request error if the comment_id is invalid', () => {
+        return request(app)
+        .delete('/api/comments/randomstring')
+        .expect(400)
+        .then(({ body }) => {
+        expect(body.msg).toBe('Bad request!')
+        })
+    })
+    test('DELETE 404: Responds with a not found error if the comment_id is valid but not found in db', () => {
+        return request(app)
+        .delete('/api/comments/285')
+        .expect(404)
+        .then(({ body }) => {
+        expect(body.msg).toBe('Comment does not exist!')
+        })
+    })
 })
