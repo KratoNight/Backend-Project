@@ -1,6 +1,6 @@
 const db = require('../db/connection')
 
-function fetchCommentsByArticleId(article_id) {
+function fetchCommentsByArticleId(article_id){
     return db.query
     (`SELECT * FROM comments
     WHERE article_id = $1        
@@ -11,4 +11,16 @@ function fetchCommentsByArticleId(article_id) {
     })
 }
 
-module.exports = { fetchCommentsByArticleId }
+function insertCommentsByArticleId(body, username, article_id){
+    return db.query(`
+    INSERT INTO comments
+    (article_id, author, body)
+    VALUES ($1, $2, $3)
+    RETURNING *;`,
+    [body, username, article_id])
+    .then(({ rows }) => {
+        return rows[0]
+    })
+}
+
+module.exports = { fetchCommentsByArticleId, insertCommentsByArticleId }

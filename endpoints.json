@@ -59,5 +59,19 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a comment with article_id defined in endpoint, serves back comment posted",
+    "queries": [],
+    "exampleResponse": {
+      "comment": {
+          "comment_id": 19,
+          "body": "Just a random comment for testing purposes!",
+          "article_id": 1,
+          "author": "lurker",
+          "votes": 0,       
+          "created_at": "2024-04-18T10:57:11.197Z"
+      }
+    }
   }
 }
