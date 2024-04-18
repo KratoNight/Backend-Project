@@ -36,7 +36,7 @@ describe('/api/some-random-api', () => {
 })
 
 describe('/api', () => {
-    test('GET 200: responds with an object describing all the available endpoints on the API', () => {
+    test('GET 200: Responds with an object describing all the available endpoints on the API', () => {
         return request(app)
         .get('/api')
         .expect(200)
@@ -97,7 +97,7 @@ describe('/api/articles/:article_id', () => {
             expect(body.msg).toBe('Article not found!');
         });
     })
-    test('GET 400: responds with a bad request error if article_id is not valid', () => {
+    test('GET 400: Responds with a bad request error if article_id is not valid', () => {
         return request(app)
           .get('/api/articles/not-a-number')
           .expect(400)
@@ -105,6 +105,72 @@ describe('/api/articles/:article_id', () => {
             expect(body.msg).toBe('Bad request!');
           });
       });
+      test('PATCH 200: Responds with correctly updated votes in article object', () => {
+        const addingNewVotes = { inc_votes : 1 } 
+        return request(app)
+        .patch('/api/articles/1')
+        .send(addingNewVotes)
+        .expect(200)
+        .then(({ body: { article }}) => {
+            const { author,  title, article_id, topic, created_at, votes, article_img_url } = article
+            expect(votes).toBe(101)
+            expect(article_id).toBe(1)
+            expect(title).toBe('Living in the shadow of a great man')
+            expect(author).toBe('butter_bridge')
+            expect(topic).toBe('mitch')
+            expect(article.body).toBe('I find this existence challenging')
+            expect(created_at).toBe('2020-07-09T20:11:00.000Z')
+            expect(article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
+        })
+    })
+    test('PATCH 200: Responds with correctly updated votes in article object but subtracting votes ', () => {
+        const takingAwayVotes = { inc_votes : -10 } 
+        return request(app)
+        .patch('/api/articles/1')
+        .send(takingAwayVotes)
+        .expect(200)
+        .then(({ body: { article }}) => {
+            const { author,  title, article_id, topic, created_at, votes, article_img_url } = article
+            expect(votes).toBe(90)
+            expect(article_id).toBe(1)
+            expect(title).toBe('Living in the shadow of a great man')
+            expect(author).toBe('butter_bridge')
+            expect(topic).toBe('mitch')
+            expect(article.body).toBe('I find this existence challenging')
+            expect(created_at).toBe('2020-07-09T20:11:00.000Z')
+            expect(article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
+        })
+    })
+    test('PATCH 400: Responds with a bad request if inv_votes value is a string', () => {
+        const testVotes = { inc_votes : 'some string'}
+        return request(app)
+        .patch('/api/articles/1')
+        .send(testVotes)
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Bad request!')
+        })
+    })
+    test('PATCH 400: Responds with a bad request if inv_votes key is not passed but a vote is', () => {
+        const testVotes = { unknown_key : 1}
+        return request(app)
+        .patch('/api/articles/1')
+        .send(testVotes)
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Bad request!')
+        })
+    })
+    test('PATCH 404: Responds with a not found error, if the article_id is valid, but doesn\'t exist within the db', () => {
+        const testVotes = { inc_votes : 1}
+        return request(app)
+        .patch('/api/articles/743')
+        .send(testVotes)
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Article not found!')
+        })
+    })
 })
 
 describe('/api/articles/:article_id/comments', () => {
