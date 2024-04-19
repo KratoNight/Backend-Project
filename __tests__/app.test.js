@@ -24,6 +24,23 @@ describe('/api/topics', () => {
     })
 })
 
+describe("/api/users", () => {
+    test("GET:200 should return an array of all users and the associated avatar-url", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body;
+          expect(users.length).toBe(4);
+          users.forEach((user) => {
+            expect(typeof user.username).toBe("string");
+            expect(typeof user.name).toBe("string");
+            expect(typeof user.avatar_url).toBe("string");
+          });
+        });
+    });
+})
+
 describe('/api/some-random-api', () => {
     test('GET 404: Responds with 404 when a unknown endpoint is called', () => {
         return request(app)

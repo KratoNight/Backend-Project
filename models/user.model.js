@@ -10,4 +10,10 @@ function checkUsernameExists(username){
         }
       });
   };
-module.exports = { checkUsernameExists }
+
+function lookingForUsers(){
+  return db.query(`
+  SELECT * FROM users;`)
+  .then(({ rows }) => rows)
+}
+module.exports = { checkUsernameExists, lookingForUsers }
