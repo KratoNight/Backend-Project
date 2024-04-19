@@ -142,8 +142,8 @@ describe('/api/articles/:article_id', () => {
             expect(created_at).toBe('2020-07-09T20:11:00.000Z')
             expect(votes).toBe(100)
             expect(article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
-        })
-    })
+        });
+    });
     test('GET 404: Responds with a 404/not found if article_id is valid but it doesn\'t exist in database', () => {
         return request(app)
         .get('/api/articles/9999')
@@ -154,10 +154,19 @@ describe('/api/articles/:article_id', () => {
     })
     test('GET 400: Responds with a bad request error if article_id is not valid', () => {
         return request(app)
-          .get('/api/articles/not-a-number')
-          .expect(400)
-          .then(({ body }) => {
+        .get('/api/articles/not-a-number')
+        .expect(400)
+        .then(({ body }) => {
             expect(body.msg).toBe('Bad request!');
+          });
+      });
+    test("GET 200: Response article has a comment count of the total number of comments by article_id", () => {
+        return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.article.comment_count).toBe(11);
+            expect(body.article.article_id).toBe(1);
           });
       });
       test('PATCH 200: Responds with correctly updated votes in article object', () => {
