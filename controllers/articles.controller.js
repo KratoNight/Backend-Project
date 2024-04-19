@@ -1,4 +1,5 @@
-const { fetchArticlesById, fetchArticles, updatingVotesByArticleId, fetchArticleIfExists } = require('../models/article.model')
+const { fetchArticlesById, fetchArticles, updatingVotesByArticleId, fetchArticleIfExists } = require('../models/article.model');
+const { fetchTopicIfItExists } = require('../models/topics.model');
 
 function getArticlesById(req, res, next){
     const { article_id } = req.params
@@ -9,11 +10,25 @@ function getArticlesById(req, res, next){
 }
 
 function getArticles(req, res, next){
-    return fetchArticles().then((articles) => {
-        res.status(200).send({ articles })
-    })
-    .catch
-}
+    const { topic } = req.query;
+    if (topic) {
+      Promise.all([fetchArticles(topic), fetchTopicIfItExists(topic)])
+        .then(([articles]) => {
+        res.status(200)
+        .send({ articles });})
+        .catch((err) => {
+        next(err);
+        });
+    } else {
+      fetchArticles(topic)
+        .then((articles) => {
+        res.status(200)
+        .send({ articles });})
+        .catch((err) => {
+        next(err);
+        });
+    }
+} 
 
 function patchVotesByArticleId(req, res, next){
     const { inc_votes } = req.body

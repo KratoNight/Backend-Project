@@ -63,27 +63,65 @@ describe('/api', () => {
     })
 })
 
-describe("GET /api/articles", () => {
+describe('/api/articles', () => {
     test('GET 200: Responds with an articles array of articles objects which match and sorted by order descending', () => {
       return request(app)
-        .get("/api/articles")
+        .get('/api/articles')
         .expect(200)
         .then(({ body }) => {
           expect(body.articles).toHaveLength(13);
-          expect(body.articles).toBeSortedBy("created_at", {
+          expect(body.articles).toBeSortedBy('created_at', {
             descending: true,
           });
           body.articles.forEach((article) => {
-            expect(typeof article.author).toBe("string");
-            expect(typeof article.title).toBe("string");
-            expect(typeof article.article_id).toBe("number");
-            expect(typeof article.topic).toBe("string");
-            expect(typeof article.created_at).toBe("string");
-            expect(typeof article.votes).toBe("number");
-            expect(typeof article.article_img_url).toBe("string");
-            expect(typeof article.comment_count).toBe("number");
+            expect(typeof article.author).toBe('string');
+            expect(typeof article.title).toBe('string');
+            expect(typeof article.article_id).toBe('number');
+            expect(typeof article.topic).toBe('string');
+            expect(typeof article.created_at).toBe('string');
+            expect(typeof article.votes).toBe('number');
+            expect(typeof article.article_img_url).toBe('string');
+            expect(typeof article.comment_count).toBe('number');
             expect(article.body).toBeUndefined();
           });
+        });
+    });
+    test('GET 200: Responds with an array of articles filtered to only include the topic of cats!!!', () => {
+        return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(1)
+            articles.forEach((article) => {
+                expect(article.topic).toBe('cats')
+            });
+        });
+    });
+    test('GET 200: Responds with an array of all articles, filtered by the topic of mitch, As mitch is a popular topic', () => {
+        return request(app)
+          .get('/api/articles?topic=mitch')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(12);
+            articles.forEach((article) => {
+                expect(article.topic).toBe('mitch');
+            });
+          });
+      });
+      test('GET 200: Responds with an empty array for an existing topic with no associated articles, this is testing the paper topic', () => {
+        return request(app)
+          .get('/api/articles?topic=paper')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+                expect(articles).toHaveLength(0);
+          });
+      });
+      test('GET 404: Responds with a not found 404 error if the topic does not exist in db', () => {
+        return request(app)
+        .get('/api/articles?topic=someSillyLittleTopic')
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Topic not found!')
         });
     });
 })
