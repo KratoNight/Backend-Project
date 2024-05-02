@@ -4,10 +4,12 @@ const { getArticlesById, getArticles, patchVotesByArticleId } = require('./contr
 const { getCommentsByArticleId, postCommentsByArticleId, deleteCommentsByCommentId} = require('./controllers/comments.controller')
 const { getUsers } = require('./controllers/users.controller')
 const endpoints = require('./endpoints.json')
+const cors = require('cors')
 
 const app = express()
 
 app.use(express.json())
+app.use(cors());
 
 app.get('/api', (req, res, next) => {
     res.status(200).send(endpoints)
